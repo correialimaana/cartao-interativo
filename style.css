@@ -9,6 +9,7 @@
     text-align: center;
     background-color: rgba(40, 226, 226, 0.678);
     height: 100%;
+    transform-style: preserve-3d;
     }
 
     .cartao__conteudo h3 {
