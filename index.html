@@ -1,42 +1,144 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartão Interativo</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image" href="eletrocc.svg">
+  <meta charset="UTF-8">
+  <title>Caça ao Tesouro Matemático</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      background-color: #e6f7ff;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 4px dashed #4b4b4b;
+      border-radius: 15px;
+      background-color: #fff8e1;
+    }
+    .question {
+      font-size: 24px;
+      margin: 20px 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .fail {
+      color: red;
+      font-weight: bold;
+    }
+    #treasure {
+      font-size: 28px;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <main>
-        <section id="container">
-        
-            <article class="cartao">
-                <div class="cartao__conteudo">
-                    <h3>Programação</h3>
-                    <div class="cartao__conteudo__pergunta">
-                        <p>O que é JavaScript?</p>
-                    </div>
-                    <div class="cartao__conteudo__resposta">
-                        <p>O JavaScript é uma linguagem de programação</p>
-                    </div>
-                </div>
-            </article>
-            <article class="cartao">
-                <div class="cartao__conteudo">
-                    <h3>Programação</h3>
-                    <div class="cartao__conteudo__pergunta">
-                        <p>O que é CSS?</p>
-                    </div>
-                    <div class="cartao__conteudo__resposta">
-                        <p>O CSS é uma linguagem de estilização</p>
-                    </div>
-                </div>
-            </article>
-        </section>
-    </main>
-    <footer>
-        <p>Projeto desenvolvido pela yasha Eletrônicos.</p>
-    </footer>
+  <div class="container">
+    <h1>🏴‍☠️ Caça ao Tesouro Matemático 🗺️</h1>
+    <div id="menu">
+      <p>Escolha a dificuldade:</p>
+      <button onclick="startGame('easy')">Fácil (até 20)</button>
+      <button onclick="startGame('medium')">Médio (até 50)</button>
+    </div>
+
+    <div id="game" style="display:none;">
+      <div id="progress">🪙 Progresso: <span id="score">0</span>/5</div>
+      <div class="question" id="question"></div>
+      <div id="choices"></div>
+      <div id="feedback"></div>
+    </div>
+
+    <div id="treasure">
+      🎉 Parabéns, pirata! Você encontrou o tesouro escondido! 🏆<br>
+      <button onclick="location.reload()">Jogar Novamente</button>
+    </div>
+  </div>
+
+  <script>
+    let difficulty = 'easy';
+    let currentAnswer = 0;
+    let score = 0;
+
+    function startGame(diff) {
+      difficulty = diff;
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('game').style.display = 'block';
+      score = 0;
+      document.getElementById('score').innerText = score;
+      newQuestion();
+    }
+
+    function getRandomNumber(max) {
+      return Math.floor(Math.random() * (max + 1));
+    }
+
+    function newQuestion() {
+      const max = (difficulty === 'easy') ? 20 : 50;
+      const a = getRandomNumber(max);
+      const b = getRandomNumber(max);
+      const isAddition = Math.random() > 0.5;
+
+      let questionText, answer;
+      if (isAddition) {
+        questionText = `${a} + ${b} = ?`;
+        answer = a + b;
+      } else {
+        let x = Math.max(a, b), y = Math.min(a, b);
+        questionText = `${x} - ${y} = ?`;
+        answer = x - y;
+      }
+      currentAnswer = answer;
+      document.getElementById('question').innerText = questionText;
+
+      // Gerar opções
+      const choices = [];
+      choices.push(answer);
+      while (choices.length < 4) {
+        let fake = answer + getRandomNumber(10) - 5;
+        if (!choices.includes(fake) && fake >= 0) {
+          choices.push(fake);
+        }
+      }
+      choices.sort(() => Math.random() - 0.5);
+
+      const choiceDiv = document.getElementById('choices');
+      choiceDiv.innerHTML = '';
+      choices.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.innerText = choice;
+        btn.onclick = () => checkAnswer(choice);
+        choiceDiv.appendChild(btn);
+      });
+
+      document.getElementById('feedback').innerText = '';
+    }
+
+    function checkAnswer(answer) {
+      if (answer === currentAnswer) {
+        document.getElementById('feedback').innerHTML = '<div class="success">✔️ Correto, pirata!</div>';
+        score++;
+        document.getElementById('score').innerText = score;
+        if (score >= 5) {
+          document.getElementById('game').style.display = 'none';
+          document.getElementById('treasure').style.display = 'block';
+          return;
+        }
+        setTimeout(newQuestion, 1000);
+      } else {
+        document.getElementById('feedback').innerHTML = '<div class="fail">❌ Ops! Tente de novo!</div>';
+      }
+    }
+  </script>
 </body>
 </html>
